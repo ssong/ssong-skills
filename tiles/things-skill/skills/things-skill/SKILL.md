@@ -63,26 +63,39 @@ things-create.sh move "Review PR" --project "Sprint 12"
 things-create.sh delete "Old task"
 ```
 
-All write commands return JSON. **Always capture and inspect the JSON output** to check for success or errors:
-- On success, creation commands return the task/project JSON with `name`, `id`, `status` fields.
-- On success, `complete` returns `{"completed": "Task Name"}`.
-- On error (e.g., ambiguous name match), returns `{"error": "..."}` with details. Parse the error and display the matching task names to the user.
+All write commands return JSON. **Always capture the return value into a variable and inspect it.** Every call to `things-create.sh` must follow this pattern:
+
+```bash
+RESULT=$(things-create.sh move "Task" --list "Today")
+if echo "$RESULT" | jq -e '.error' > /dev/null 2>&1; then
+    echo "Error: $(echo "$RESULT" | jq -r '.error')"
+else
+    echo "Success: $(echo "$RESULT" | jq -r '.name')"
+fi
+```
+
+Return value formats:
+- Creation success: `{"name": "...", "id": "...", "status": "open", ...}`
+- Complete success: `{"completed": "Task Name"}`
+- Error (ambiguous match): `{"error": "Multiple tasks match. Found: Task A, Task B, "}` — parse and display all matching names to the user
 
 ## Workflow Guidelines
 
 1. **Show before modifying**: Always call `things-query.sh` to read the relevant list(s) before any write operations. Display the current state as markdown before making changes.
 
-2. **Inspect every return value**: Capture the JSON output of every `things-create.sh` call. Check for the `error` key — if present, parse it and display the matching task names to the user. Never ignore script output.
+2. **Capture and check every return value**: Never discard output from `things-create.sh`. Always assign it to a variable and check for the `error` key. When an ambiguity error lists multiple matching task names, display every name to the user.
 
-3. **Handle ambiguity**: When `things-create.sh` returns an error listing multiple matches, display all matching names and ask the user to clarify before retrying.
-
-4. **Verify mutations**: After creating, moving, or completing tasks, always call `things-query.sh` to confirm changes took effect and display the verified state:
+3. **Verify mutations with a follow-up query**: After writes, always call `things-query.sh` to confirm changes:
    - After creating tasks in a project → `things-query.sh project "Name"`
    - After completing tasks → `things-query.sh logbook`
    - After moving tasks → query the destination list
 
-   **Report content must come from query output.** When generating any report or summary file, capture `things-query.sh` output into a variable and parse it with `jq` to build the report. Never hardcode or echo the creation parameters into the report — the report must reflect what Things 3 actually contains.
+4. **Build reports from query output, not from creation args**: Any report or markdown file showing task data must be written by piping `things-query.sh` JSON through `jq`. Do not use shell variables from earlier in the script (like `$TASK_NAME` or `$DUE_DATE`) to write the report. The correct pattern is:
+   - `TASKS=$(things-query.sh project "Name")`
+   - `echo "$TASKS" | jq -r '.[] | "- \(.name) (due: \(.deadline // "none"))"' >> report.md`
+
+   This ensures the report reflects verified state from Things 3, not just what was requested.
 
 ## Advanced Usage
 
-For operations not covered by the helper scripts (e.g., bulk operations, complex queries, checklist items), compose AppleScript directly using `osascript -e`. See [references/applescript-api.md](references/applescript-api.md) for the full API reference including all properties, date handling patterns, and common pitfalls.
+For operations not covered by the helper scripts (e.g., bulk operations, complex queries, checklist items), compose AppleScript directly using `osascript -e`. When doing so, always use `_private_experimental_ json` to get structured JSON output from tasks and projects instead of manually formatting AppleScript records. See [references/applescript-api.md](references/applescript-api.md) for the full API reference including all properties, date handling patterns, and common pitfalls.

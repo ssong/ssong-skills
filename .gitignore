@@ -1,1 +1,10 @@
 **/*.local.json
+.agents
+.claude/skills
+.codex
+.gemini
+.github/skills
+.mcp.json
+.tessl
+.vscode
+tessl.json

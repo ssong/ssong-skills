@@ -116,15 +116,18 @@ end tell
 
 Valid list targets: Today, Someday, Anytime, Tomorrow.
 
-### Assign task to a project
+### Create a task inside a project
+
+Tasks must be assigned to a project at creation time. Use `make new to do of proj`:
 
 ```applescript
 tell application "Things3"
-    set t to first to do whose name is "Task Name"
     set proj to first project whose name is "Project Name"
-    move t to proj
+    set newTodo to make new to do of proj with properties {name:"Task Name", notes:"Details"}
 end tell
 ```
+
+Note: `move to do to project` does NOT work in Things 3. Always create tasks inside the project directly.
 
 ### Complete a task
 

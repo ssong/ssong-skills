@@ -41,20 +41,32 @@ case "${1:-help}" in
         [ -n "$TAGS" ] && PROPS="${PROPS}, tag names:\"${TAGS}\""
 
         # Build the AppleScript
-        SCRIPT="tell application \"Things3\"
-    set newTodo to make new to do with properties {${PROPS}}"
+        SCRIPT="tell application \"Things3\""
 
-        # Due date requires date coercion
-        if [ -n "$DUE_DATE" ]; then
-            SCRIPT="${SCRIPT}
-    set due date of newTodo to date \"${DUE_DATE}\""
-        fi
-
-        # Assign to project
+        # Create task: if assigning to a project, create inside it directly
         if [ -n "$PROJECT" ]; then
             SCRIPT="${SCRIPT}
     set proj to first project whose name is \"${PROJECT}\"
-    move newTodo to proj"
+    set newTodo to make new to do of proj with properties {${PROPS}}"
+        else
+            SCRIPT="${SCRIPT}
+    set newTodo to make new to do with properties {${PROPS}}"
+        fi
+
+        # Due date — parse YYYY-MM-DD into components to avoid locale issues
+        if [ -n "$DUE_DATE" ]; then
+            DUE_YEAR=$(echo "$DUE_DATE" | cut -d'-' -f1)
+            DUE_MONTH=$(echo "$DUE_DATE" | cut -d'-' -f2 | sed 's/^0//')
+            DUE_DAY=$(echo "$DUE_DATE" | cut -d'-' -f3 | sed 's/^0//')
+            SCRIPT="${SCRIPT}
+    set theDate to current date
+    set year of theDate to ${DUE_YEAR}
+    set month of theDate to ${DUE_MONTH}
+    set day of theDate to ${DUE_DAY}
+    set hours of theDate to 0
+    set minutes of theDate to 0
+    set seconds of theDate to 0
+    set due date of newTodo to theDate"
         fi
 
         # Move to list (Today, Someday, etc.)
@@ -147,14 +159,17 @@ end tell"
         TASK_NAME="$1"
         shift
         LIST=""
-        PROJECT=""
         while [ $# -gt 0 ]; do
             case "$1" in
                 --list) LIST="$2"; shift 2 ;;
-                --project) PROJECT="$2"; shift 2 ;;
                 *) echo "Unknown option: $1" >&2; exit 1 ;;
             esac
         done
+
+        if [ -z "$LIST" ]; then
+            echo "Usage: things-create.sh move \"Task Name\" --list \"Today\"" >&2
+            exit 1
+        fi
 
         SCRIPT="tell application \"Things3\"
     set matchingTodos to every to do whose name is \"${TASK_NAME}\"
@@ -171,19 +186,8 @@ end tell"
         end repeat
         return \"{\\\"error\\\": \\\"Multiple tasks match. Found: \" & names & \"\\\"}\"
     end if
-    set targetTodo to item 1 of matchingTodos"
-
-        if [ -n "$LIST" ]; then
-            SCRIPT="${SCRIPT}
-    move targetTodo to list \"${LIST}\""
-        fi
-        if [ -n "$PROJECT" ]; then
-            SCRIPT="${SCRIPT}
-    set proj to first project whose name is \"${PROJECT}\"
-    move targetTodo to proj"
-        fi
-
-        SCRIPT="${SCRIPT}
+    set targetTodo to item 1 of matchingTodos
+    move targetTodo to list \"${LIST}\"
     return _private_experimental_ json of targetTodo
 end tell"
 
@@ -235,8 +239,7 @@ end tell"
         echo "    --area \"Name\"           Assign to area"
         echo ""
         echo "  complete \"Task Name\"      Complete a task"
-        echo "  move \"Name\" --list \"..\"   Move task to a list"
-        echo "  move \"Name\" --project \"\" Move task to a project"
+        echo "  move \"Name\" --list \"..\"   Move task to a list (Today, Someday, Anytime, Tomorrow)"
         echo "  delete \"Task Name\"        Delete a task"
         ;;
 esac

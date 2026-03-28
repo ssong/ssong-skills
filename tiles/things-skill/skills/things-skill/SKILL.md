@@ -55,9 +55,8 @@ things-create.sh project "Q2 Planning" --notes "Quarterly goals" --area "Work"
 # Complete a task
 things-create.sh complete "Buy groceries"
 
-# Move a task
+# Move a task to a scheduling list
 things-create.sh move "Review PR" --list "Today"
-things-create.sh move "Review PR" --project "Sprint 12"
 
 # Delete a task
 things-create.sh delete "Old task"

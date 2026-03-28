@@ -1,7 +1,8 @@
 {
   "name": "ssong-skills/things-skill",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "summary": "Manage Things 3 tasks on macOS via AppleScript. Full CRUD: view, create, complete, move, and delete tasks and projects across all Things 3 lists.",
+  "entrypoint": "README.md",
   "docs": "skills/things-skill/references/applescript-api.md",
   "skills": {
     "things-skill": {

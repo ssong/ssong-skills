@@ -5,39 +5,29 @@ description: "Manage Things 3 tasks on macOS -- view lists, create tasks with de
 
 # Things 3 Task Manager
 
-Manage Things 3 tasks on macOS using AppleScript via `osascript`. Zero external dependencies.
-
-## Prerequisites
-
-- macOS with Things 3 installed
-- Things 3 will auto-launch if not running when commands are executed
+Manage Things 3 tasks on macOS using AppleScript via `osascript`. Zero external dependencies. Requires macOS with Things 3 installed (auto-launches if not running).
 
 ## Helper Scripts
 
 This skill includes two shell scripts in `scripts/` relative to this SKILL.md file. Determine the absolute path to the scripts directory from this file's location.
 
-**Always use these helper scripts for all Things 3 operations.** Do not use raw `osascript` commands when a helper script covers the operation -- the scripts handle JSON output, error handling, and ambiguity detection. This applies whether running commands directly or generating shell scripts for the user. When writing a shell script that interacts with Things 3, call these helper scripts from within it.
+**Always use these helper scripts for all Things 3 operations.** Do not use raw `osascript` when a helper script covers the operation. This applies whether running commands directly or generating shell scripts. When writing a shell script that interacts with Things 3, call these helper scripts from within it.
 
 ### Reading Tasks -- `scripts/things-query.sh`
 
 ```bash
-# List tasks in built-in views
-things-query.sh today          # Today's tasks
-things-query.sh inbox          # Inbox tasks
-things-query.sh upcoming       # Upcoming tasks
-things-query.sh anytime        # Anytime tasks
-things-query.sh someday        # Someday tasks
-things-query.sh tomorrow       # Tomorrow's tasks
-things-query.sh logbook        # Completed tasks
-
-# Projects, tags, areas
-things-query.sh projects       # All projects (with child tasks)
-things-query.sh project "Name" # Tasks in a specific project
-things-query.sh tags           # All tags
-things-query.sh areas          # All areas
-
-# Search
-things-query.sh search "term"  # Search tasks by name
+things-query.sh today              # Today's tasks
+things-query.sh inbox              # Inbox tasks
+things-query.sh upcoming           # Upcoming tasks
+things-query.sh anytime            # Anytime tasks
+things-query.sh someday            # Someday tasks
+things-query.sh tomorrow           # Tomorrow's tasks
+things-query.sh logbook            # Completed tasks
+things-query.sh projects           # All projects (with child tasks)
+things-query.sh project "Name"     # Tasks in a specific project
+things-query.sh search "term"      # Search tasks by name
+things-query.sh tags               # All tags
+things-query.sh areas              # All areas
 ```
 
 All commands output JSON arrays. Parse the JSON and present results as clean markdown tables or lists.
@@ -95,25 +85,13 @@ Return value formats:
 
    This ensures the report reflects verified state from Things 3, not just what was requested.
 
-## Advanced Usage
+## Raw AppleScript
 
-For operations not covered by the helper scripts (e.g., bulk operations, complex queries, checklist items), compose AppleScript directly using `osascript -e`. When doing so, follow these rules:
+For operations not covered by the helper scripts (bulk operations, checklist items, relative deadline assignment), compose AppleScript directly using `osascript -e`. Follow these rules:
 
-- **Always get task data via `_private_experimental_ json`**. This is the only way to get structured output from Things 3. To output JSON for a task: `return _private_experimental_ json of myTodo`. For multiple tasks, build a JSON array by concatenating the json property of each item:
-  ```applescript
-  set output to "["
-  set isFirst to true
-  repeat with t in todoList
-      if not isFirst then set output to output & ","
-      set output to output & (_private_experimental_ json of t)
-      set isFirst to false
-  end repeat
-  set output to output & "]"
-  return output
-  ```
-  Never manually build JSON strings from individual properties -- always use `_private_experimental_ json`.
-- **Use relative dates only**: Set due dates with `(current date) + N * days`. Never use `date "YYYY-MM-DD"` -- it is locale-dependent and produces wrong results.
-- **Avoid `result` as a variable name** -- it is reserved in AppleScript. Use `output` instead.
-- **Guard against empty lists**: Always use `every to do` and check `count` before accessing items.
+- **Output**: Always use `_private_experimental_ json` -- never manually build JSON from properties
+- **Dates**: Always use `(current date) + N * days` -- never `date "YYYY-MM-DD"` (locale-dependent, wrong results)
+- **Variables**: Use `output` not `result` (reserved keyword)
+- **Empty lists**: Guard with `count` checks before accessing items
 
 See [references/applescript-api.md](references/applescript-api.md) for the full API reference.

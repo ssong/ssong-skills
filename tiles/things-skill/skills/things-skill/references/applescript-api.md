@@ -95,14 +95,16 @@ end tell
 
 ### Set due date
 
-Due dates require AppleScript date objects. The format depends on the user's macOS locale:
+**Always use relative date arithmetic.** Never use `date "YYYY-MM-DD"` -- it is locale-dependent and produces wrong dates on most systems.
 
 ```applescript
--- Relative dates (locale-independent, preferred)
-set due date of newTodo to (current date) + 3 * days
+-- Correct: relative dates (locale-independent)
+set due date of newTodo to (current date) + 5 * days
+set due date of newTodo to (current date) + 10 * days
+set due date of newTodo to (current date) + 14 * days
 
--- Absolute dates (locale-dependent)
-set due date of newTodo to date "2026-04-01"
+-- WRONG: do not use absolute date literals
+-- set due date of newTodo to date "2026-04-01"  -- BREAKS on non-US locales
 ```
 
 ### Move task to a list
@@ -184,7 +186,7 @@ end tell
 
 ## Common Pitfalls
 
-1. **Date locale sensitivity**: `date "2026-04-01"` parsing depends on macOS locale. Prefer relative dates like `(current date) + N * days` when possible.
+1. **Never use absolute date literals**: `date "2026-04-01"` is locale-dependent and produces wrong dates. Always use `(current date) + N * days` for due dates.
 
 2. **Empty list errors**: Querying `first to do of list "Today"` when Today is empty throws an error. Always guard with a count check:
    ```applescript

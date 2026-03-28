@@ -55,7 +55,7 @@ things-create.sh project "Q2 Planning" --notes "Quarterly goals" --area "Work"
 # Complete a task
 things-create.sh complete "Buy groceries"
 
-# Move a task to a scheduling list
+# Move a task to a scheduling list (Today, Someday, Anytime, Tomorrow)
 things-create.sh move "Review PR" --list "Today"
 
 # Delete a task
@@ -97,4 +97,11 @@ Return value formats:
 
 ## Advanced Usage
 
-For operations not covered by the helper scripts (e.g., bulk operations, complex queries, checklist items), compose AppleScript directly using `osascript -e`. When doing so, always use `_private_experimental_ json` to get structured JSON output from tasks and projects instead of manually formatting AppleScript records. See [references/applescript-api.md](references/applescript-api.md) for the full API reference including all properties, date handling patterns, and common pitfalls.
+For operations not covered by the helper scripts (e.g., bulk operations, complex queries, checklist items), compose AppleScript directly using `osascript -e`. When doing so, follow these rules:
+
+- **Use `_private_experimental_ json`** to get structured JSON output from tasks and projects. Never manually format AppleScript records into strings.
+- **Use relative dates only**: Set due dates with `(current date) + N * days`. Never use `date "YYYY-MM-DD"` -- it is locale-dependent and produces wrong results.
+- **Avoid `result` as a variable name** -- it is reserved in AppleScript. Use `output` instead.
+- **Guard against empty lists**: Always use `every to do` and check `count` before accessing items.
+
+See [references/applescript-api.md](references/applescript-api.md) for the full API reference.

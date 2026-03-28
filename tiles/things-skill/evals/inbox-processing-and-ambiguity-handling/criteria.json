@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the agent queries the inbox before making changes (show-before-modify), uses things-create.sh move for reorganization, properly handles ambiguous name errors from the move command, re-queries to verify the updated state, and formats output as markdown.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Inbox query first",
+      "max_score": 12,
+      "description": "Script calls things-query.sh inbox BEFORE calling things-create.sh move — the read command appears earlier in execution than the write commands"
+    },
+    {
+      "name": "Inbox shown as markdown",
+      "max_score": 8,
+      "description": "The inbox_report.md presents the initial inbox contents as a markdown table or bullet list, not raw JSON"
+    },
+    {
+      "name": "Move via things-create.sh",
+      "max_score": 12,
+      "description": "Uses things-create.sh with the 'move' subcommand (with --list or --project flag) to reorganize tasks, not raw osascript"
+    },
+    {
+      "name": "Valid list flag value",
+      "max_score": 8,
+      "description": "The --list flag uses only valid list targets: Today, Someday, Anytime, or Tomorrow (not Inbox or Upcoming)"
+    },
+    {
+      "name": "Ambiguity error displayed",
+      "max_score": 16,
+      "description": "When things-create.sh move returns a JSON error with multiple matches, the script parses and displays the matching task names to the user rather than silently ignoring or crashing"
+    },
+    {
+      "name": "Move result inspected",
+      "max_score": 10,
+      "description": "Script reads and checks the JSON returned by things-create.sh move (for 'error' or success) rather than ignoring the return value"
+    },
+    {
+      "name": "Post-move re-query",
+      "max_score": 12,
+      "description": "Script calls things-query.sh again after moves (on inbox and/or destination lists) to capture and display the updated state"
+    },
+    {
+      "name": "Destination list queried",
+      "max_score": 8,
+      "description": "After moving tasks, script queries the destination list(s) (e.g., today, anytime, or a project) to confirm tasks arrived there"
+    },
+    {
+      "name": "Before section in report",
+      "max_score": 7,
+      "description": "The inbox_report.md contains a clearly labelled Before (or initial inbox) section showing inbox contents prior to any moves"
+    },
+    {
+      "name": "After section in report",
+      "max_score": 7,
+      "description": "The inbox_report.md contains a clearly labelled After (or updated state) section showing the inbox and destination lists after all moves"
+    }
+  ]
+}

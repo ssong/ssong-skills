@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the agent uses the things-create.sh helper script correctly for both project and task creation, passes the appropriate property flags, re-queries to verify created items, and presents results as markdown.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Project creation command",
+      "max_score": 10,
+      "description": "Uses things-create.sh with the 'project' subcommand to create the project (not raw osascript or other methods)"
+    },
+    {
+      "name": "Task creation command",
+      "max_score": 10,
+      "description": "Uses things-create.sh with the 'task' subcommand for each task (not raw osascript or other methods)"
+    },
+    {
+      "name": "Notes flag used",
+      "max_score": 10,
+      "description": "Passes --notes flag with descriptive content to at least one task creation call"
+    },
+    {
+      "name": "Due date flag used",
+      "max_score": 10,
+      "description": "Passes --due flag with a date value to at least one task creation call"
+    },
+    {
+      "name": "Tags flag used",
+      "max_score": 10,
+      "description": "Passes --tags flag with tag values to at least one task creation call"
+    },
+    {
+      "name": "Project assignment flag",
+      "max_score": 10,
+      "description": "Uses --project flag to assign tasks to the project, or --list to assign to a scheduling list"
+    },
+    {
+      "name": "Creation result inspected",
+      "max_score": 8,
+      "description": "Script reads the JSON returned by things-create.sh task or project calls (checking the output) rather than ignoring return values"
+    },
+    {
+      "name": "Post-creation query",
+      "max_score": 12,
+      "description": "Calls things-query.sh (with 'project', 'today', or another view command) after creating tasks to verify and display the created items"
+    },
+    {
+      "name": "Query before show",
+      "max_score": 10,
+      "description": "The setup_report.md shows created task data derived from things-query.sh output, not just echoing the creation commands"
+    },
+    {
+      "name": "Markdown output",
+      "max_score": 10,
+      "description": "The setup_report.md formats task data as markdown tables or lists rather than raw JSON"
+    }
+  ]
+}

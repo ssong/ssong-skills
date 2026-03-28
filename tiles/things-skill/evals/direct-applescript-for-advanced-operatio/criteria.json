@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the agent composes AppleScript directly with osascript -e for operations not covered by the helper scripts, uses locale-safe relative date arithmetic, avoids the reserved 'result' variable name, uses _private_experimental_ json for output, and guards against empty list errors.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Uses osascript directly",
+      "max_score": 11,
+      "description": "Script invokes osascript -e (or osascript with a heredoc/file) to execute AppleScript, rather than relying solely on things-create.sh or things-query.sh for the deadline/checklist operations"
+    },
+    {
+      "name": "Relative date arithmetic",
+      "max_score": 12,
+      "description": "AppleScript sets due dates using relative arithmetic like '(current date) + N * days' rather than absolute date strings"
+    },
+    {
+      "name": "No absolute date literals",
+      "max_score": 9,
+      "description": "Does NOT use the pattern date \"YYYY-MM-DD\" or similar locale-dependent date literals when setting due dates on tasks"
+    },
+    {
+      "name": "Avoids 'result' variable",
+      "max_score": 8,
+      "description": "AppleScript code does NOT use 'result' as a variable name for string accumulation; uses 'output' or another name instead"
+    },
+    {
+      "name": "Uses _private_experimental_ json",
+      "max_score": 10,
+      "description": "AppleScript uses the '_private_experimental_ json' property to retrieve structured data from task or project objects"
+    },
+    {
+      "name": "Empty list guard",
+      "max_score": 10,
+      "description": "AppleScript checks the count of query results before accessing items (e.g., 'if (count of todoList) > 0') or uses 'every to do' to safely handle potentially empty lists"
+    },
+    {
+      "name": "Name lookup with count check",
+      "max_score": 10,
+      "description": "AppleScript uses 'every to do whose name is/contains' with a subsequent count check, rather than 'first to do whose name is' without a guard, when finding tasks by name"
+    },
+    {
+      "name": "Checklist items in script",
+      "max_score": 10,
+      "description": "Script includes AppleScript for adding checklist items (using 'make new to do' within a task/project context, or setting checklist items property) — an operation not available in the helper scripts"
+    },
+    {
+      "name": "Three distinct deadlines",
+      "max_score": 10,
+      "description": "Script sets different relative deadlines (e.g., +5 days, +10 days, +14 days) for at least three different tasks"
+    },
+    {
+      "name": "Markdown deadline report",
+      "max_score": 10,
+      "description": "The deadline_report.md presents the tasks and their deadlines as a markdown table or list (not raw JSON)"
+    }
+  ]
+}

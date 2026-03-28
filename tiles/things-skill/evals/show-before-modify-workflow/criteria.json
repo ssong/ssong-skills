@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the agent queries relevant lists before making changes (show-before-modify), uses the helper scripts correctly for both reading and writing, formats output as markdown, verifies changes by re-querying after mutations, and presents before/after states.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Query before modify",
+      "max_score": 14,
+      "description": "Script calls things-query.sh to read list contents BEFORE calling things-create.sh to make any changes — query commands appear earlier in the script than write commands"
+    },
+    {
+      "name": "Multiple list queries (before)",
+      "max_score": 10,
+      "description": "Script calls things-query.sh for at least two different lists (e.g., today, inbox, someday) as part of the before-state capture"
+    },
+    {
+      "name": "Correct query subcommands",
+      "max_score": 8,
+      "description": "Uses valid things-query.sh subcommands: today, inbox, upcoming, anytime, someday, tomorrow, logbook, projects, project, tags, areas, or search"
+    },
+    {
+      "name": "Write via things-create.sh move",
+      "max_score": 10,
+      "description": "Uses things-create.sh with the 'move' subcommand for the reorganization step, not raw osascript or other methods"
+    },
+    {
+      "name": "Valid list targets",
+      "max_score": 8,
+      "description": "The --list flag in things-create.sh move uses only valid targets: Today, Someday, Anytime, or Tomorrow (not Inbox or Upcoming)"
+    },
+    {
+      "name": "Move result checked",
+      "max_score": 8,
+      "description": "Script inspects the JSON returned by things-create.sh move (checking for success or error fields) rather than ignoring the output"
+    },
+    {
+      "name": "Post-change re-query",
+      "max_score": 14,
+      "description": "Script calls things-query.sh again AFTER making changes to capture the updated state of affected lists"
+    },
+    {
+      "name": "Markdown formatting",
+      "max_score": 10,
+      "description": "The review_report.md presents task data as markdown tables or bullet lists, NOT as raw JSON"
+    },
+    {
+      "name": "Before section in report",
+      "max_score": 9,
+      "description": "The review_report.md contains a clearly labelled Before (or initial state) section showing list contents prior to any moves"
+    },
+    {
+      "name": "After section in report",
+      "max_score": 9,
+      "description": "The review_report.md contains a clearly labelled After (or updated state) section showing list contents after moves are complete"
+    }
+  ]
+}

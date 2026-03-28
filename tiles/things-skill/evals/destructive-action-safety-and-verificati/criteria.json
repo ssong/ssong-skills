@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the agent shows matched tasks before completing them, uses things-create.sh complete, verifies completion by re-querying the logbook, and surfaces ambiguous name matches to the user rather than silently proceeding.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Search before completing",
+      "max_score": 11,
+      "description": "Script calls things-query.sh search (or another read command) BEFORE any things-create.sh complete calls, to show the user what tasks exist"
+    },
+    {
+      "name": "Tasks shown as markdown",
+      "max_score": 8,
+      "description": "Tasks found by the search are presented as a markdown list or table (not raw JSON) before any completion is attempted"
+    },
+    {
+      "name": "Complete via things-create.sh",
+      "max_score": 11,
+      "description": "Uses things-create.sh with the 'complete' subcommand to mark tasks done (not raw osascript)"
+    },
+    {
+      "name": "Return value inspected",
+      "max_score": 9,
+      "description": "Script reads and inspects the JSON returned by things-create.sh complete (checking for 'completed' or 'error' key) rather than ignoring the output"
+    },
+    {
+      "name": "Ambiguity error surfaced",
+      "max_score": 14,
+      "description": "When things-create.sh returns a JSON error indicating multiple matches, the script parses that error and displays the matching task names to the user rather than silently proceeding or aborting without explanation"
+    },
+    {
+      "name": "Logbook re-query",
+      "max_score": 11,
+      "description": "Script calls things-query.sh logbook after completions to verify completed tasks appear there"
+    },
+    {
+      "name": "Logbook shown as markdown",
+      "max_score": 8,
+      "description": "The logbook contents displayed in the report are formatted as a markdown list or table (not raw JSON)"
+    },
+    {
+      "name": "Completion confirmed in report",
+      "max_score": 9,
+      "description": "The sprint_closure_report.md includes an explicit section noting which tasks were successfully completed and which had errors, based on the JSON return values"
+    },
+    {
+      "name": "Query subcommand used correctly",
+      "max_score": 9,
+      "description": "Uses a valid things-query.sh subcommand for the initial task lookup (e.g., 'search' with a term, 'today', 'anytime', 'inbox')"
+    },
+    {
+      "name": "Logbook queried after completions",
+      "max_score": 10,
+      "description": "The things-query.sh logbook call appears AFTER the completion attempts in the script (verifying the completed state, not checking logbook first)"
+    }
+  ]
+}

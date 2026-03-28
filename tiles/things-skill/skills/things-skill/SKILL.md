@@ -99,7 +99,19 @@ Return value formats:
 
 For operations not covered by the helper scripts (e.g., bulk operations, complex queries, checklist items), compose AppleScript directly using `osascript -e`. When doing so, follow these rules:
 
-- **Use `_private_experimental_ json`** to get structured JSON output from tasks and projects. Never manually format AppleScript records into strings.
+- **Always get task data via `_private_experimental_ json`**. This is the only way to get structured output from Things 3. To output JSON for a task: `return _private_experimental_ json of myTodo`. For multiple tasks, build a JSON array by concatenating the json property of each item:
+  ```applescript
+  set output to "["
+  set isFirst to true
+  repeat with t in todoList
+      if not isFirst then set output to output & ","
+      set output to output & (_private_experimental_ json of t)
+      set isFirst to false
+  end repeat
+  set output to output & "]"
+  return output
+  ```
+  Never manually build JSON strings from individual properties -- always use `_private_experimental_ json`.
 - **Use relative dates only**: Set due dates with `(current date) + N * days`. Never use `date "YYYY-MM-DD"` -- it is locale-dependent and produces wrong results.
 - **Avoid `result` as a variable name** -- it is reserved in AppleScript. Use `output` instead.
 - **Guard against empty lists**: Always use `every to do` and check `count` before accessing items.
